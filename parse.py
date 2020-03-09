@@ -153,18 +153,35 @@ def userActivityMau():
 
 def retention():
     userdict = userActivity()
+    numSignUps = len(userdict)
     retentionList = []
     for x in userdict:
         if userdict[x] == set():
             continue
         a = sorted(list(userdict[x]))
         first = a[0]
-        for i in a:
-            difference = (i - first).days
-            retentionList.append(difference)
+        last = a[-1]
+        difference = (last - first).days
+        retentionList.append(difference)
+    counter = 0
+    percentageList = []
+    percentageList2 = []
+    while counter <= 100:
+        tempcount = 0
+        for day in retentionList:
+            if day >= counter:
+                #print("counter: "+ str(counter) + "//day: " + str(day) +"//tc: "+ str(tempcount))
+                tempcount += 1
+
+        #percentageList.insert(0,float(tempcount/numSignUps))
+        percentageList.append(100*(tempcount/numSignUps))
+        percentageList2.append(counter)
+        counter += 1
+    print(percentageList)
 
 
-    plt.hist(retentionList, bins = 50)
+    plt.plot(percentageList2, percentageList)
+    plt.ylim(0, 100)
     plt.show()
 
 
@@ -242,4 +259,4 @@ def userActivityMonth():
 
 
 
-userActivityMau()
+retention()
