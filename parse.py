@@ -118,11 +118,11 @@ def userActivityDau():
     userdict = userActivity()
     alldays = []
     alldayssign = []
-    
+
     for x in userdict:
         print(x)
         iterusers = list(userdict[x])
-	
+
 
         for y in iterusers:
             print(y)
@@ -242,4 +242,4 @@ def userActivityMonth():
 
 
 
-userActivityDau()
+userActivityMau()
