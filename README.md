@@ -7,12 +7,20 @@ Calculates and graphs DAU/MAU, retention numbers, and engagement curve.
 
 Also allows site creator to identify accounts based on time since enrollment or time since last access for manual sending of onboarding/re-engagement emails. In progress of adding mailchimp API hooks to automate the emails. Shouldn't be too much work, will require mailchimp premium, which seems like a pain in the ass.
 
+### The Classic Retention Curve
+
+![alt text](https://github.com/hoppersroppers/moodleAnalytics/raw/master/img/80pc.png "retention")
+
+Holy hell, 20% of users never access the course after signup. 
+And then they all leave. All of them. 
+
 ### Daily Active Users (Blue) and Daily Returning Users (Orange) Since Launch
 
 ![alt text](https://raw.githubusercontent.com/hoppersroppers/moodleAnalytics/master/img/DAUnSignups.png "DAU")
 
+At least this is going up!
 
-### Retention (as Measured by Number of Logins)  
+### Retention (as Measured by Number of Logins/User)  
 
 ![alt text](https://raw.githubusercontent.com/hoppersroppers/moodleAnalytics/master/img/activityHistogram.png
  "retention")
