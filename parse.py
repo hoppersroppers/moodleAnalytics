@@ -119,21 +119,29 @@ def userActivityDau():
     alldays = []
     alldayssign = []
 
+    count = 0
+    userCount = 0
     for x in userdict:
         print(x)
         iterusers = list(userdict[x])
-
-
+        countList = []
+        tempcount = 0
         for y in iterusers:
-            print(y)
+            tempcount += 1
             alldays.append(y)
-
+        if count >= 2:
+            userCount += 1
+            count += tempcount
+            tempcount = 0
+        else:
+            tempcount = 0
         for y in iterusers[1:-1]:
 
-            print(y)
+
             alldayssign.append(y)
 
     difference = (endDate - startDate).days
+    print(str(count) + " " + str(userCount))
     plt.hist(alldays, bins = difference)
     plt.hist(alldayssign, bins = difference)
     plt.show()
@@ -177,12 +185,16 @@ def retention():
         percentageList.append(100*(tempcount/numSignUps))
         percentageList2.append(counter)
         counter += 1
-    print(percentageList)
-
+    #print(percentageList)
+    print(percentageList[0])
+    print(percentageList[6])
+    print(percentageList[29])
 
     plt.plot(percentageList2, percentageList)
     plt.ylim(0, 100)
     plt.show()
+
+
 
 
 
@@ -259,4 +271,4 @@ def userActivityMonth():
 
 
 
-retention()
+userActivityDau()
