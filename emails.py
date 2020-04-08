@@ -12,6 +12,8 @@ from email.mime.multipart import MIMEMultipart
 from email.header import Header
 from email.utils import formataddr
 
+import requests
+
 
 
 smtp_server = "mail.hoppersroppers.org"
@@ -21,6 +23,9 @@ sender_email = "contact@hoppersroppers.org"
 password = "*****************"
 
 token = "****************"
+
+username = 'd.m.devey@gmail.com'
+apikey = '***********************'
 
 
 
@@ -111,6 +116,8 @@ def signUpDrip():
     for i in days1:
         sender_email = "contact@hoppersroppers.org"
         receiver_email = i[1]
+        signUp(receiver_email)
+
         message = MIMEMultipart("alternative")
 
         text = """\
@@ -412,9 +419,53 @@ Stay stoked
         server.sendmail(sender_email, receiver_email, message.as_string())
         print("Email proabably sent to " + receiver_email)
 
+    sender_email = "contact@hoppersroppers.org"
+    receiver_email = "d.m.devey@gmail.com"
+    message = MIMEMultipart("alternative")
+
+    text = """\
+    It probably worked today:
+
+    Emails sent to:
+    """
+
+    text += str(days1, days2, days3, days5, days7)
+
+
+
+
+    message["Subject"] = "Sign-Up Emails Sent"
+    message["From"] = formataddr((str(Header("Hopper's Roppers", "utf-8")), sender_email ))
+    message["To"] = receiver_email
+
+    # Turn these into plain/html MIMEText objects
+    part1 = MIMEText(text, "plain")
+
+    # Add HTML/plain-text parts to MIMEMultipart message
+    # The email client will try to render the last part first
+    message.attach(part1)
+
+    #print(sender_email, receiver_email, message)
+    server.sendmail(sender_email, receiver_email, message.as_string())
+    print("Confirmation Email probably sent to " + receiver_email)
 
 # Add HTML/plain-text parts to MIMEMultipart message
 # The email client will try to render the last part first
+
+def signUp(emailAddr):
+
+
+    url = "https://us5.api.mailchimp.com/3.0/lists/8d9620c4b7/members"
+
+    post_params = {'email_address': emailAddr, 'status': 'subscribed'}
+
+    r = requests.post(url, auth=(username, apikey), json=post_params)
+    r.raise_for_status()
+
+    results = r.json()
+    print(results)
+
+
 
 context = ssl._create_unverified_context()
 
