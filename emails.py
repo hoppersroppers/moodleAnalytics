@@ -16,17 +16,7 @@ import requests
 
 from emailContent import *
 
-
-smtp_server = "mail.hoppersroppers.org"
-port = 587  # For starttls
-
-sender_email = "contact@hoppersroppers.org"
-password = "**********"
-
-token = "*********************"
-
-username = 'd.m.devey@gmail.com'
-apikey = '***********************'
+from notincluded import *
 
 
 
