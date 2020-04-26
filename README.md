@@ -1,37 +1,47 @@
-# moodleAnalytics
-A simple script to run retention and engagement analytics for my security training site <https://academy.hoppersroppers.org>.
+# Moodle Analytics
+In order to measure and improve my numbers, I wrote a series of scripts to run retention and engagement analytics for my security training site <https://academy.hoppersroppers.org>. It converts the logs from the Moodle LMS into a pandas dataframe and goes from there.
 
-## tl;dr Retention in free online courses is as bad as people say it is. 
+We can calculate DAU/WAU/MAU, do cohort retention heatmaps, check the number of students who do a particular action, or really anything else we want to. This all integrates very nicely with my emailing script, so in theory I can personalize the emails even better going forward, but it isn't a priority.
 
-Calculates and graphs DAU/MAU, retention numbers, and engagement curve. 
+## tl;dr Retention in free online courses is as bad as people say it is.
 
-Also allows site creator to identify accounts based on time since enrollment or time since last access for manual sending of onboarding/re-engagement emails. In progress of adding mailchimp API hooks to automate the emails. Shouldn't be too much work, will require mailchimp premium, which seems like a pain in the ass.
+###  Cohort Retention Heatmaps
 
-### The Classic Retention Curve
+![Cohort Heatmap Monthly](https://github.com/hoppersroppers/moodleAnalytics/raw/master/img/cohortPerc.png "retention")
 
-![alt text](https://github.com/hoppersroppers/moodleAnalytics/raw/master/img/80pc.png "retention")
+We can easily do retention cohorts by Day/Week/Month and have it display a percentage or a count. With numbers this low, a count demonstrates things better.
 
-Holy hell, 20% of users never access the course after signup. 
-And then they all leave. All of them. 
+![Cohort Heatmap Weekly](https://github.com/hoppersroppers/moodleAnalytics/raw/master/img/cohortCount.png "retention count")
 
-### Daily Active Users (Blue) and Daily Returning Users (Orange) Since Launch
+### DAU, WAU, MAU
 
-![alt text](https://raw.githubusercontent.com/hoppersroppers/moodleAnalytics/master/img/DAUnSignups.png "DAU")
+At least these are going up!
 
-At least this is going up!
-
-### Retention (as Measured by Number of Logins/User)  
-
-![alt text](https://raw.githubusercontent.com/hoppersroppers/moodleAnalytics/master/img/activityHistogram.png
- "retention")
-
-### Days Between User's Last Activity and Sign-Up 
-
-![alt text](https://raw.githubusercontent.com/hoppersroppers/moodleAnalytics/master/img/retention.png "DAU")
+![WAU](https://raw.githubusercontent.com/hoppersroppers/moodleAnalytics/master/img/WAU.png "WAU")
+![MAU](https://raw.githubusercontent.com/hoppersroppers/moodleAnalytics/master/img/MAU.png "MAU")
 
 
+## Content Analytics
 
-Hopefully automated onboarding emails will result in significantly better initial retention in the first week. 
+Here, we are using the script to see how many people complete each assignment. This provides teacher's great insights on which assignments they are losing students on. In this case, we can see that more than half of all students never install a VM. That means that even after our initial drop off of students who never return to the course, we lose half that number at a single section.
 
-After the first week of automated emails, when students go inactive I plan to pass students over to an automated re-engagement email series. 
+Time to go figure out how to make that easier for students.
 
+![completed Activities](https://raw.githubusercontent.com/hoppersroppers/moodleAnalytics/master/img/completed.png "signups")
+
+### Action Completions
+
+In this case, we are using the script to track the number of new registrations.
+
+![New Singups](https://raw.githubusercontent.com/hoppersroppers/moodleAnalytics/master/img/signUps.png "signups")
+
+Here we are tracking the number of assignments that are submitted each week. Looking at this, it is obvious that the vast majority of students never submit an assignment. What does a teacher have to do to get better engagement? Probably not offer a free online course.
+
+![Assignments Completed](https://raw.githubusercontent.com/hoppersroppers/moodleAnalytics/master/img/assign.png "assign")
+
+
+### Way Forward
+
+I am currently sending fully automated onboarding emails at 1,2,3,5 and 7 days, and retention emails at 15,30,45,60,90, and 120 days of inactivity. These emails are not customized or based off of anything, they are just Hail Mary's to get students back on the site and improve the numbers.
+
+At some point I will really sit down and do some reading on how to improve these. 

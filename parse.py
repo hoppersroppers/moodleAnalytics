@@ -2,6 +2,9 @@
 
 from datetime import datetime
 import matplotlib.pyplot as plt
+import matplotlib.ticker as ticker
+import matplotlib.dates as mdates
+
 import csv
 
 import pandas as pd
@@ -20,175 +23,29 @@ from cohort import *
 
 
 
-startDate = datetime.strptime('01/11/19', '%d/%m/%y')
+startDate = datetime.strptime('01/01/20', '%d/%m/%y')
 endDate = datetime.today()
 
 
-def userActivityHistogram():
-    userdict = userActivity()
-    listOfVisits = []
+def cohort(flagSet, periodFlag, countFlag):
 
-    for x in userdict:
-        print(x)
-        if x == "System Administrator":
-            continue
-        for y in userdict[x]:
-            print(y)
+    df = getActivity(flagSet)
 
-        listOfVisits.append(len(userdict[x]))
-
-    plt.hist(listOfVisits, bins = 50)
-    plt.show()
-
-def userActivityDau():
-    userdict = userActivity()
-    alldays = []
-    alldayssign = []
-
-    count = 0
-    userCount = 0
-    for x in userdict:
-        print(x)
-        iterusers = list(userdict[x])
-        countList = []
-        tempcount = 0
-        for y in iterusers:
-            tempcount += 1
-            alldays.append(y)
-        if count >= 2:
-            userCount += 1
-            count += tempcount
-            tempcount = 0
-        else:
-            tempcount = 0
-        for y in iterusers[1:-1]:
-
-
-            alldayssign.append(y)
-
-    difference = (endDate - startDate).days
-    print(str(count) + " " + str(userCount))
-    plt.hist(alldays, bins = difference)
-    plt.hist(alldayssign, bins = difference)
-    plt.show()
-
-def userActivityMau():
-    userdict = userActivityMonth()
-    alldays = []
-    for x in userdict:
-        print(x)
-        for y in userdict[x]:
-            print(y)
-            alldays.append(y)
-
-    #difference = int(((endDate - startDate).days)/30)
-    plt.hist(alldays, bins = 12)
-    plt.show()
-
-def retention():
-    userdict = userActivity()
-    numSignUps = len(userdict)
-    retentionList = []
-    for x in userdict:
-        if userdict[x] == set():
-            continue
-        if userdict[x] == []:
-            continue
-        p
-        a = sorted(list(userdict[x]))
-        print(a)
-        first = a[0]
-        last = a[-1]
-        difference = (last - first).days
-        retentionList.append(difference)
-    counter = 0
-    percentageList = []
-    percentageList2 = []
-    while counter <= 100:
-        tempcount = 0
-        for day in retentionList:
-            if day >= counter:
-                #print("counter: "+ str(counter) + "//day: " + str(day) +"//tc: "+ str(tempcount))
-                tempcount += 1
-
-        #percentageList.insert(0,float(tempcount/numSignUps))
-        percentageList.append(100*(tempcount/numSignUps))
-        percentageList2.append(counter)
-        counter += 1
-    #print(percentageList)
-    print(percentageList[0])
-    print(percentageList[6])
-    print(percentageList[29])
-
-    plt.plot(percentageList2, percentageList)
-    plt.ylim(0, 100)
-    plt.show()
-
-def cohort():
-    df = pd.DataFrame(columns=["name", "date", "first", "last"])
-
-    userdict = userActivity()
-
-    for i in userdict:
-        x = userdict[i]
-        try:
-            for j in x[0]:
-                df = df.append({
-             "name": i,
-             "date":  j,
-             "first": x[1],
-             "last": x[2]
-              }, ignore_index=True)
-                    #print(df)
-        except:
-            print(i)
-
-
-    df = df.sort_values(by=['date'])
+    finaldf = df.sort_values(by=['Time'])
     print("About to Analyze")
-    analysis=cohort_analysisWeekly(input_df=df, ActivityDate='date', CustomerID='name')
-
+    analysis=cohort_analysisWeekly(input_df=finaldf, ActivityDate='Time', CustomerID='User_full_name', countFlag=countFlag, periodFlag=periodFlag)
+    #print(finaldf.to_string())
     ## Generate retention heatmap
     print("Plotting")
     analysis.plot_retention()
     print("Done")
 
+
 def cohortActive(flagSet):
 
-    userdict = {}
-    with open('..\\..\\..\\Downloads\\Users (3).csv') as csvfile2:
-        userreader = csv.reader(csvfile2, delimiter=',')
-        for row in userreader:
-            userdict[row[3]+" "+row[4]] = []
-
-
-
-    #df = pd.DataFrame(columns=["date", "name", "activity", "action"])
-    df = pd.read_csv('..\..\..\Downloads\logs (4).csv', skipinitialspace = True)
-    df.columns = df.columns.str.replace(' ', '_')
-    print(list(df))
-    df['Time'] = pd.to_datetime(df['Time'])
-
-    df2 = df.loc[:, ["Time", "User_full_name", "Event_context", "Event_name", "Description"]]
-    #print(df2)
-    df2 = df2.query('User_full_name != "System Administrator"')
-    df2 = df2.query('User_full_name != "-"')
-    df2 = df2.query('Event_context != "System"')
-    df2 = df2.drop_duplicates(subset=None, keep='first', inplace=False)
-
-    # Event_context other is when the old module name has been deleted and is no longer available. Not the best, but whatever.
-
-    df2 = df2.query('Event_context != "Other"')
-    df2 = df2[df2["Time"] < endDate]
-
-
-    if flagSet == "uploads":
-        finaldf = df2.query('Event_name == "A file has been uploaded." or Event_name == "An online text has been uploaded."')
-
-    if flagSet == "complete":
-        finaldf = df2.query('Event_name == "Course activity completion updated"')
-    #print(uploads.to_string())
-
+    df = getActivity(flagSet)
+    finaldf = byActivity(df, "completeFlag")
+    print(finaldf)
 
     finaldf = finaldf.sort_values(by=['Time'])
     print("About to Analyze")
@@ -201,23 +58,8 @@ def cohortActive(flagSet):
 
 def userActivityPull(flagSet, email):
 
-    userdict = {}
-    with open('..\\..\\..\\Downloads\\Users (3).csv') as csvfile2:
-        userreader = csv.reader(csvfile2, delimiter=',')
-        for row in userreader:
-            userdict[row[3]+" "+row[4]] = []
-
-
-
-    #df = pd.DataFrame(columns=["date", "name", "activity", "action"])
-    df = pd.read_csv('..\..\..\Downloads\logs (4).csv', skipinitialspace = True)
-    df.columns = df.columns.str.replace(' ', '_')
-    print(list(df))
-    df['Time'] = pd.to_datetime(df['Time'])
-
-    df2 = df.loc[:, ["Time", "User_full_name", "Event_context", "Event_name"]]
-    #print(df2)
-    df2 = df2.query('User_full_name =='+email)
+    df2 = getActivity(flagSet)
+    df2 = df2.query('Email =='+email)
     df2 = df2.query('Event_context != "System"')
     df2 = df2.drop_duplicates(subset=None, keep='first', inplace=False)
 
@@ -237,101 +79,115 @@ def userActivityPull(flagSet, email):
         finaldf = df2
     #print(uploads.to_string())
 
-
     finaldf = finaldf.sort_values(by=['Time'])
     print(finaldf.to_string())
+    return(finaldf)
 
-def userActivity():
+def activityByWeek(flagSet):
+    df2 = getActivity(flagSet)
+    df2 = byActivity(df2, flagSet)
+    df2['Time'] = df2['Time'].dt.strftime('%Y-%U')
 
+    df2 = df2.loc[:, ["Time", "User_full_name",]]
+
+    counter = df2.drop_duplicates(subset=None, keep='first', inplace=False)
+
+    counter = counter.groupby(['Time']).size()
+
+    counter = counter.to_frame(name = 'Size').reset_index()
+
+    #counter = counter.sort_values(["Size"])
+    print(counter)
+    total = counter['Size'].sum()
+    print(total)
+    counter.plot(x='Time', y='Size', rot=90)
+    plt.gca().set_ylabel('Number')
+    plt.gca().set_xlabel('Week')
+    plt.gca().set_title('Assignments Completed Per Week')
+    #plt.gca().invert_xaxis()
+    plt.show()
+    return(counter)
+
+def activityByDay(flagSet):
+    df2 = getActivity(flagSet)
+    df2 = byActivity(df2, flagSet)
+    #df2 = byActivity(df2, flagSetAction)
+    df2['Time'] = df2['Time'].dt.strftime('%Y-%m-%d')
+
+    df2 = df2.loc[:, ["Time", "User_full_name",]]
+
+    counter = df2.drop_duplicates(subset=None, keep='first', inplace=False)
+    counter = counter.groupby(['Time']).size()
+
+    counter = counter.to_frame(name = 'Size').reset_index()
+    #counter = counter.sort_values(["Size"])
+    print(counter)
+    total = counter['Size'].sum()
+    print(total)
+
+    FMT = '%Y-%m-%d' #2019-04-08
+    counter['Time'] = counter['Time'].map(lambda x: datetime.strptime(str(x), FMT))
+    #counter['Time'] = counter['Time'].map(lambda x: x.replace(day=date, month=month, year=year))
+
+    ax = counter.plot(x='Time', y='Size', rot=90, kind='bar')
+    ax.set_xlabel('x label name')
+#plt.xticks(np.arange(start, end+1, 15.0))
+    #ax = plt.axes()
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+
+    #ax.xaxis.set_minor_locator(mdates.DayLocator(interval=30))
+    ax.xaxis.set_major_locator(mdates.MonthLocator())
+
+    #ax.tick_params(axis='both', which='major', labelsize=5) #labelsize=5 instead of labelsize=10
+
+
+    #plt.gcf().autofmt_xdate()
+
+    #plt.autofmt_xdate()
+
+    #ax.grid(True)
+
+    plt.show()
+    return(counter)
+
+def activityByMonth(flagSet):
+    df2 = getActivity(flagSet)
+    df2 = byActivity(df2, flagSet)
+    df2['Time'] = df2['Time'].dt.strftime('%Y-%m')
+
+    df2 = df2.loc[:, ["Time", "User_full_name",]]
+
+    counter = df2.drop_duplicates(subset=None, keep='first', inplace=False)
+    counter = counter.groupby(['Time']).size()
+
+    counter = counter.to_frame(name = 'Size').reset_index()
+    #counter = counter.sort_values(["Size"])
+    print(counter)
+    total = counter['Size'].sum()
+    print(total)
+    counter.plot(x='Time', y='Size', rot=90)
+    plt.gca().set_ylabel('Number')
+    plt.gca().set_xlabel('Week')
+    plt.gca().set_title('Monthly Active Users')
+    #plt.gca().invert_xaxis()
+    plt.show()
+    return(counter)
+
+def getActivity(flagSet):
     userdict = {}
     with open('..\\..\\..\\Downloads\\Users (3).csv') as csvfile2:
         userreader = csv.reader(csvfile2, delimiter=',')
         for row in userreader:
-            userdict[row[3]+" "+row[4]] = []
-            #print(row[2])
+            userdict[row[3]+" "+row[4]] = row[2]
+            #print(row)
 
-    thisdict = {}
-    today = datetime.today()
-    users = []
-    with open('..\..\..\Downloads\logs (4).csv') as csvfile:
-        next(csvfile)
-        spamreader = csv.reader(csvfile, delimiter=',')
-        for row in reversed(list(spamreader)):
-            if row[1] != '-' and row[1] != "Guest user  ":
-                unfilteredDate =datetime.strptime(row[0], '%d/%m/%y, %H:%M')
-                if unfilteredDate >= startDate and unfilteredDate <= endDate:
-                    filteredDate = unfilteredDate
-
-                    try:
-                        userdict[row[1]].append(filteredDate)
-                    except KeyError:
-                       print("ERROR:" + row[1])
-    for x in userdict:
-        if x == "System Administrator":
-            userdict[x] = []
-        #print(userdict[x])
-        s = {d for d in userdict[x]}
-
-        #print(x+": "+str(len(s)))
-        if s == set():
-            continue
-        a = sorted(list(s))
-        first = a[0]
-        last = a[-1]
-        difference = (last - first).days
-
-        userdict[x] = (s,first,last,difference)
-
-
-    return(userdict)
-
-
-def userActivityMonth():
-
-    userdict = {}
-    with open('..\\..\\..\\Downloads\\Users (3).csv') as csvfile2:
-        userreader = csv.reader(csvfile2, delimiter=',')
-        for row in userreader:
-            userdict[row[3]+" "+row[4]] = []
-
-    thisdict = {}
-    today = datetime.today()
-    users = []
-    with open('..\..\..\Downloads\logs (4).csv') as csvfile:
-        next(csvfile)
-        spamreader = csv.reader(csvfile, delimiter=',')
-        for row in reversed(list(spamreader)):
-            if row[1] != '-' and row[1] != "Guest user  ":
-                unfilteredDate =datetime.strptime(row[0], '%d/%m/%y, %H:%M').date()
-                if unfilteredDate >= startDate and unfilteredDate <= endDate:
-                    filteredDate = unfilteredDate
-
-                    try:
-                        userdict[row[1]].append(filteredDate)
-                    except:
-                        print(row[1])
-    for x in userdict:
-        if x == "System Administrator":
-            userdict[x] = []
-        #print(userdict[x])
-        s = {d.month for d in userdict[x]}
-        #print(x+": "+str(len(s)))
-        userdict[x] = s
-    return(userdict)
-
-def byActivity(flagSet, minSize):
-
-    userdict = {}
-    with open('..\\..\\..\\Downloads\\Users (3).csv') as csvfile2:
-        userreader = csv.reader(csvfile2, delimiter=',')
-        for row in userreader:
-            userdict[row[3]+" "+row[4]] = []
 
 
 
     #df = pd.DataFrame(columns=["date", "name", "activity", "action"])
     df = pd.read_csv('..\..\..\Downloads\logs (4).csv', skipinitialspace = True)
     df.columns = df.columns.str.replace(' ', '_')
+    df['Time'] = pd.to_datetime(df['Time'])
     print(list(df))
 
     df2 = df.loc[:, ["Time", "User_full_name", "Event_context", "Event_name"]]
@@ -350,40 +206,87 @@ def byActivity(flagSet, minSize):
     # This filters out all the feedback stuff. Don't provide any value to our analytics
     # it is a bit sneaky, we are inversing the operation with the tilde
         df2 = df2[~df2["Event_context"].str.contains('Feedback:', regex=False)]#.str.contains("Feedback:", na=False)]
+    else:
+        df2 = df2.query('User_full_name != "Guest user  "')
+
+    # there is a bug in moodle, this gets rid of some data that is in the future...its valid data, but because of importing the dates get fucked.
+    df2 = df2[df2["Time"] < endDate]
+    df2 = df2[df2["Time"] > startDate]
+
+    df2['Email'] = df['User_full_name'].map(userdict)
+    return(df2)
+
+def byActivity(df2, flagSetAction):
 
 
-    if flagSet == "uploadsFlag":
+    if flagSetAction == "uploadsFlag":
 
-        uploads = df2.query('Event_name == "A file has been uploaded." or Event_name == "An online text has been uploaded."')
-        uploads = uploads.groupby(['Event_context']).size()
+        finaldf = df2.query('Event_name == "A file has been uploaded." or Event_name == "An online text has been uploaded."')
+
+    elif flagSetAction == "viewsFlag":
+
+        finaldf = df2.query('Event_name == "Course module viewed"')
+
+    elif flagSetAction == "completeFlag":
+
+        finaldf = df2.query('Event_name == "Course activity completion updated"')
+
+    elif flagSetAction == "signUp":
+        finaldf = df2.drop_duplicates(subset="User_full_name", keep='first', inplace=False)
+
+    else:
+        finaldf = df2
+
+    #print(finaldf.to_string())
+    return(finaldf)
+
+def activeFilter(df2, flagSetAction, minSize):
+
+
+    if flagSetAction == "uploadsFlag":
+
+        uploads = df2.groupby(['Event_context']).size()
         uploads = uploads.to_frame(name = 'Size').reset_index()
         uploads = uploads.sort_values(["Size"])
+        uploads = uploads.query('Size >='+str(minSize))
 
-    if flagSet == "viewsFlag":
+        finaldf = uploads
+
+    elif flagSetAction == "viewsFlag":
         counter = df2.groupby(['Event_context', 'Event_name']).size()
         counter = counter.to_frame(name = 'Size').reset_index()
         counter = counter.sort_values(["Size"])
         counter = counter.query('Size >='+str(minSize))
-        views = counter.query('Event_name == "Course module viewed"')
-        finaldf = views
+        finaldf = counter
 
-    if flagSet == "completeFlag":
+    elif flagSetAction == "completeFlag":
         counter = df2.groupby(['Event_context', 'Event_name']).size()
         counter = counter.to_frame(name = 'Size').reset_index()
         counter = counter.sort_values(["Size"])
         counter = counter.query('Size >='+str(minSize))
-        completed = counter.query('Event_name == "Course activity completion updated"')
-        finaldf = completed
+        finaldf = counter
+    else:
+        finaldf = df2
 
-    #print(completed.to_string())
-    finaldf.plot.bar(x='Event_context', y='Size', rot=90)
-    plt.gca().invert_xaxis()
-    plt.show()
+    #print(finaldf.to_string())
+    return(finaldf)
+
+def plotByActivity(finaldf):
+        finaldf.plot(x='Event_context', y='Size', rot=90, kind="bar")
+        plt.gca().invert_xaxis()
+        plt.gca().set_ylabel('Number')
+        plt.gca().set_xlabel('Activity Name')
+        plt.gca().set_title('Completed Activities')
+        plt.show()
 
 
-#byActivity("completeFlag", 50)
 
-cohortActive("complete")
-#cohort()
+activityByWeek("completeFlag")
 
-#userActivityPull("complete", "'Timo Niere'")
+#x = getActivity("no")
+#out = byActivity(x,"uploadsFlag")
+#out = activeFilter(out, "uploadsFlag", 10)
+#plotByActivity(out)
+
+
+#userActivityPull("no", "'h3lmsman@autistici.org'")
