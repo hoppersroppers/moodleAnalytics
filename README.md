@@ -17,8 +17,9 @@ We can easily do retention cohorts by Day/Week/Month and have it display a perce
 
 At least these are going up!
 
-![WAU](https://raw.githubusercontent.com/hoppersroppers/moodleAnalytics/master/img/WAU.png "WAU")
-![MAU](https://raw.githubusercontent.com/hoppersroppers/moodleAnalytics/master/img/MAU.png "MAU")
+![WAU](https://raw.githubusercontent.com/hoppersroppers/moodleAnalytics/master/img/wau.png "WAU")
+
+![MAU](https://raw.githubusercontent.com/hoppersroppers/moodleAnalytics/master/img/mau.png "MAU")
 
 
 ## Content Analytics
