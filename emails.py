@@ -18,6 +18,7 @@ from emailContent import *
 
 from notincluded import *
 
+import json
 
 
 def getUsers():
@@ -507,6 +508,58 @@ def signUp(emailAddr):
     except:
         print(r)
 
+def createTag(tagName):
+
+
+
+    url = "https://us5.api.mailchimp.com/3.0/lists/8d9620c4b7/segments"
+
+    post_params = {'name': tagName, "static_segment":[]}
+
+    r = requests.post(url, auth=(username, apikey), json=post_params)
+    try:
+        r.raise_for_status()
+
+        results = r.json()
+        print(results)
+    except:
+        print(r)
+
+def addTag(email,tagNumber):
+
+    url = "https://us5.api.mailchimp.com/3.0/lists/8d9620c4b7/segments/"+tagNumber+"/members"
+
+    post_params = {'email_address': email}
+
+    r = requests.post(url, auth=(username, apikey), json=post_params)
+    try:
+        r.raise_for_status()
+
+        results = r.json()
+        print(results)
+    except:
+        print(r)
+
+def printTag(emailAddr):
+
+    import hashlib
+    emailHash = (hashlib.md5(emailAddr.lower().encode('utf-8')).hexdigest())
+
+
+    url = "https://us5.api.mailchimp.com/3.0/lists/8d9620c4b7/members/"+emailHash+"/tags"
+
+
+    r = requests.get(url, auth=(username, apikey))
+    try:
+        r.raise_for_status()
+
+        results = r.json()
+        print(results)
+        y = json.loads(results)
+        print(y)
+
+    except:
+        print(r)
 
 def autoEmail():
     userdict = getUsers()
@@ -515,7 +568,11 @@ def autoEmail():
     print("Auto Emailing Complete")
 
 
+#addTag("d.m.devey@gmail.com","250313")
 
+#createTag("newStudentsMay20")
+printTag("d.m.devey@gmail.com")
+"""
 userdict = getUsers()
 
 context = ssl._create_unverified_context()
@@ -536,3 +593,4 @@ with smtplib.SMTP(smtp_server, port) as server:
     server.ehlo()  # Can be omitted
     server.login(sender_email, password)
     retentionDrip(userdict)
+"""
