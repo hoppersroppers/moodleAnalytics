@@ -16,6 +16,7 @@ import requests
 
 from emailContent import *
 
+<<<<<<< HEAD
 
 smtp_server = "mail.hoppersroppers.org"
 port = 587  # For starttls
@@ -29,6 +30,9 @@ token = "********************7"
 
 username = 'd.m.devey@gmail.com'
 apikey = '******************************7'
+
+from notincluded import *
+
 
 
 
