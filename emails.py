@@ -46,7 +46,7 @@ def getUsers():
     print(users)
 
 
-    while number < 450:
+    while number < 550:
         fullArg = request+str(number)
         print(fullArg)
         with open("out.txt", "w") as file:
@@ -74,6 +74,7 @@ def getUsers():
 
 
 def retentionDrip(userdict):
+    day1 = []
     days15 = []
     days30 = []
     days45 = []
@@ -100,16 +101,17 @@ def retentionDrip(userdict):
             continue
         if  differenceFirst.days == 1:
             signUp(email)
+            tagNumber = "250313"
+            addTag(email,tagNumber)
+            day1.append([email])
         if differenceLast.days == 15:
             days15.append([email])
 
         if differenceLast.days == 30:
             days30.append([email])
 
-
         if differenceLast.days == 45:
             days45.append([email])
-
 
         if differenceLast.days == 60:
             days60.append([email])
@@ -279,7 +281,7 @@ def retentionDrip(userdict):
     Emails sent to:
     """
 
-    text += str((days15, days30, days45, days60, days90, days120))
+    text += str((day1, days15, days30, days45, days60, days90, days120))
 
 
 
@@ -558,6 +560,22 @@ def addTag(email,tagNumber):
     except:
         print(r)
 
+def removeTag(email, tagName):
+
+    url = "https://us5.api.mailchimp.com/3.0/lists/8d9620c4b7/members/"+emailHash+"/tags"
+
+    post_params = {"name": tagName, "status": "inactive"}
+
+    r = requests.post(url, auth=(username, apikey), json=post_params)
+    try:
+        r.raise_for_status()
+
+        results = r.json()
+        print(results)
+    except:
+        print(r)
+
+
 def printTag(emailAddr):
 
     import hashlib
@@ -579,13 +597,6 @@ def printTag(emailAddr):
     except:
         print(r)
 
-def autoEmail():
-    userdict = getUsers()
-    signupDrip(userdict)
-    retentionDrip(userdict)
-    print("Auto Emailing Complete")
-
-
 
 context = ssl._create_unverified_context()
 
@@ -595,6 +606,7 @@ with smtplib.SMTP(smtp_server, port) as server:
     server.ehlo()  # Can be omitted
     server.login(sender_email, password)
     signupDrip(userdict)
+
 
 """
 context = ssl._create_unverified_context()
