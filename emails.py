@@ -16,9 +16,24 @@ import requests
 
 from emailContent import *
 
+
+smtp_server = "mail.hoppersroppers.org"
+port = 587  # For starttls
+
+
+
+sender_email = "contact@hoppersroppers.org"
+password = "****C"
+
+token = "********************7"
+
+username = 'd.m.devey@gmail.com'
+apikey = '******************************7'
+
 from notincluded import *
 
 import json
+
 
 
 def getUsers():
@@ -78,13 +93,13 @@ def retentionDrip(userdict):
         print(x)
 
         email = x[0]
-        #differenceFirst = today-datetime.strptime(x[1], '%Y-%m-%d %H:%M:%S').date()
-
+        differenceFirst = today-datetime.strptime(x[1], '%Y-%m-%d %H:%M:%S').date()
         differenceLast = today-datetime.strptime(x[2], '%Y-%m-%d %H:%M:%S').date()
 
         if x == "-" or x == 'Guest user  ':
             continue
-
+        if  differenceFirst.days == 1:
+            signUp(email)
         if differenceLast.days == 15:
             days15.append([email])
 
@@ -447,8 +462,8 @@ def signupDrip(userdict):
         message["To"] = receiver_email
 
         # Turn these into plain/html MIMEText objects
-        part1 = MIMEText(text, "plain")
-        part2 = MIMEText(html, "html")
+        part1 = MIMEText(textDay7, "plain")
+        part2 = MIMEText(htmlDay7, "html")
 
         # Add HTML/plain-text parts to MIMEMultipart message
         # The email client will try to render the last part first
@@ -459,6 +474,8 @@ def signupDrip(userdict):
         server.sendmail(sender_email, receiver_email, message.as_string())
         print("Email proabably sent to " + receiver_email)
 
+
+    print("Sending confirmation email.")
     sender_email = "contact@hoppersroppers.org"
     receiver_email = "d.m.devey@gmail.com"
     message = MIMEMultipart("alternative")
@@ -507,6 +524,7 @@ def signUp(emailAddr):
         print(results)
     except:
         print(r)
+
 
 def createTag(tagName):
 
@@ -568,12 +586,6 @@ def autoEmail():
     print("Auto Emailing Complete")
 
 
-#addTag("d.m.devey@gmail.com","250313")
-
-#createTag("newStudentsMay20")
-printTag("d.m.devey@gmail.com")
-"""
-userdict = getUsers()
 
 context = ssl._create_unverified_context()
 
@@ -584,7 +596,7 @@ with smtplib.SMTP(smtp_server, port) as server:
     server.login(sender_email, password)
     signupDrip(userdict)
 
-
+"""
 context = ssl._create_unverified_context()
 
 with smtplib.SMTP(smtp_server, port) as server:
