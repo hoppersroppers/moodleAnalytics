@@ -19,17 +19,6 @@ from emailContent import *
 
 smtp_server = "mail.hoppersroppers.org"
 port = 587  # For starttls
-
-
-
-sender_email = "contact@hoppersroppers.org"
-password = "****C"
-
-token = "********************7"
-
-username = 'd.m.devey@gmail.com'
-apikey = '******************************7'
-
 from notincluded import *
 
 import json
@@ -46,7 +35,7 @@ def getUsers():
     print(users)
 
 
-    while number < 550:
+    while number < 650:
         fullArg = request+str(number)
         print(fullArg)
         with open("out.txt", "w") as file:
@@ -597,6 +586,8 @@ def printTag(emailAddr):
     except:
         print(r)
 
+
+userdict = getUsers()
 
 context = ssl._create_unverified_context()
 
